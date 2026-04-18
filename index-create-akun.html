@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Zee App | Create Account</title>
+    <link rel="icon" type="image/png" href="p3.png">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+
+    <style>
+        body, html {
+            margin: 0; padding: 0; min-height: 100vh; width: 100%;
+            font-family: 'Inter', sans-serif;
+            user-select: none;
+            overflow-x: hidden;
+            padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+        }
+
+        .full-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -2; object-fit: cover; }
+        
+        .overlay { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.6)); 
+            z-index: -1; 
+        }
+
+        .font-love { font-family: 'Playfair Display', serif; letter-spacing: 1px; }
+
+        .content-wrapper { 
+            position: relative; z-index: 10; min-height: 100vh; 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            padding: 40px 20px; 
+        }
+
+        /* CARD PUTIH */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 1);
+            border-radius: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            width: 100%;
+            max-width: 400px;
+            padding: 3rem 2rem;
+            animation: cardAppear 0.8s ease-out forwards;
+        }
+
+        @keyframes cardAppear { 
+            from { opacity: 0; transform: translateY(20px); } 
+            to { opacity: 1; transform: translateY(0); } 
+        }
+
+        .input-error { border: 2px solid #ff4d6d !important; background: rgba(255, 77, 109, 0.05) !important; }
+        
+        /* INPUT & SELECT STYLE */
+        input, select { 
+            background: #f8fafc !important; 
+            border: 1px solid #e2e8f0 !important;
+            color: #1e293b !important;
+            transition: all 0.3s ease;
+        }
+        input::placeholder { color: #94a3b8; }
+        input:focus, select:focus { 
+            border-color: #ff4d6d !important; 
+            background: #ffffff !important;
+            outline: none; 
+            box-shadow: 0 0 0 4px rgba(255, 77, 109, 0.1); 
+        }
+
+        option { background: white; color: #1e293b; }
+
+        .avatar-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 10px; }
+        .avatar-option {
+            aspect-ratio: 1/1; border-radius: 15px; cursor: pointer; border: 2px solid #f1f5f9;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); background: #f8fafc; padding: 5px;
+        }
+        .avatar-option.selected { border-color: #ff4d6d; transform: scale(1.1); background: rgba(255, 77, 109, 0.05); }
+
+        /* Toast Notif */
+        #customToast {
+            position: fixed; top: -100px; left: 50%; transform: translateX(-50%);
+            padding: 12px 24px; border-radius: 30px; 
+            color: #1e293b; font-weight: 700; z-index: 1000; transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            display: flex; align-items: center; gap: 12px; min-width: 280px;
+            background: white; box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            border: 1px solid #e2e8f0;
+        }
+        #customToast.show { top: 30px; }
+
+        .btn-shine { background: linear-gradient(135deg, #ff4d6d, #ff8fa3); position: relative; overflow: hidden; }
+        .btn-shine::after { content: ""; position: absolute; top: 0; left: -100%; width: 50%; height: 100%; background: linear-gradient(to right, transparent, rgba(255,255,255,0.4), transparent); transform: skewX(-25deg); animation: shine 4s infinite; }
+        @keyframes shine { 0%, 20% { left: -100%; } 80%, 100% { left: 150%; } }
+
+        .loading-spin { border: 3px solid rgba(255,255,255,0.3); border-radius: 50%; border-top: 3px solid #fff; width: 20px; height: 20px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* KOTAK VERIFIKASI RAPI */
+        .white-verify-box {
+            background: #f1f5f9;
+            border-radius: 20px;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border: 1px solid #e2e8f0;
+            margin-top: 8px;
+        }
+        .math-text {
+            color: #ff4d6d;
+            font-weight: 800;
+            font-size: 1.1rem;
+            letter-spacing: 1px;
+        }
+        #mathAnswer {
+            width: 80px;
+            height: 40px;
+            text-align: center;
+            font-size: 1rem;
+            background: white !important;
+            border-radius: 12px !important;
+            border: 1px solid #cbd5e1 !important;
+            margin: 0 !important;
+        }
+        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+    </style>
+</head>
+<body>
+
+    <img src="p1.png" class="full-bg" alt="Background">
+    <div class="overlay"></div>
+
+    <div id="customToast">
+        <div id="toastIconContainer" class="w-8 h-8 flex-shrink-0 flex items-center justify-center">
+            <img id="toastImgIcon" src="" class="w-full h-full object-contain">
+        </div>
+        <span id="toastMsg" class="text-sm"></span>
+    </div>
+
+    <div class="content-wrapper">
+        <div class="glass-card">
+            <img src="p2.png" alt="Logo" class="w-24 h-24 mx-auto mb-4 object-contain animate__animated animate__pulse animate__infinite">
+            <h1 class="text-4xl font-love text-slate-800 text-center mb-1">Zee App</h1>
+            <p class="text-slate-400 font-bold mb-8 text-[9px] tracking-[0.4em] uppercase text-center">Security Registration</p>
+
+            <form id="registerForm" class="space-y-4">
+                <div id="group-secretName">
+                    <label class="text-[10px] font-black ml-1 uppercase tracking-[0.2em] text-slate-500">Nama Rahasia</label>
+                    <input type="text" id="secretName" placeholder="Contoh: Mystery Boy" class="w-full py-3 px-5 rounded-2xl mt-1 text-sm font-semibold">
+                </div>
+
+                <div id="group-gender">
+                    <label class="text-[10px] font-black ml-1 uppercase tracking-[0.2em] text-slate-500">Gender</label>
+                    <select id="gender" class="w-full py-3 px-5 rounded-2xl mt-1 text-sm font-semibold cursor-pointer">
+                        <option value="" disabled selected>Pilih Gender...</option>
+                        <option value="Laki-laki">♂ Male</option>
+                        <option value="Perempuan">♀ Female</option>
+                        <option value="Rahasia">Rahasia 🤫</option>
+                    </select>
+                </div>
+
+                <div id="group-avatar">
+                    <label class="text-[10px] font-black ml-1 uppercase tracking-[0.2em] text-slate-500">Pilih Avatar</label>
+                    <div class="avatar-grid">
+                        <img src="https://cdn-icons-png.flaticon.com/512/4825/4825112.png" class="avatar-option" onclick="selectAvatar(this)">
+                        <img src="https://cdn-icons-png.flaticon.com/512/4825/4825082.png" class="avatar-option" onclick="selectAvatar(this)">
+                        <img src="https://cdn-icons-png.flaticon.com/512/4825/4825027.png" class="avatar-option" onclick="selectAvatar(this)">
+                        <img src="https://cdn-icons-png.flaticon.com/512/4825/4825051.png" class="avatar-option" onclick="selectAvatar(this)">
+                        <img src="https://cdn-icons-png.flaticon.com/512/4825/4825062.png" class="avatar-option" onclick="selectAvatar(this)">
+                        <img src="https://cdn-icons-png.flaticon.com/512/4825/4825015.png" class="avatar-option" onclick="selectAvatar(this)">
+                        <img src="https://cdn-icons-png.flaticon.com/512/4825/4825087.png" class="avatar-option" onclick="selectAvatar(this)">
+                        <img src="https://cdn-icons-png.flaticon.com/512/4825/4825038.png" class="avatar-option" onclick="selectAvatar(this)">
+                    </div>
+                </div>
+
+                <div id="group-username">
+                    <label class="text-[10px] font-black ml-1 uppercase tracking-[0.2em] text-slate-500">Username</label>
+                    <input type="text" id="username" placeholder="username123" class="w-full py-3 px-5 rounded-2xl mt-1 text-sm font-semibold">
+                </div>
+
+                <div class="relative" id="group-password">
+                    <label class="text-[10px] font-black ml-1 uppercase tracking-[0.2em] text-slate-500">Password</label>
+                    <input type="password" id="password" placeholder="••••••••" class="w-full py-3 px-5 rounded-2xl mt-1 text-sm font-semibold">
+                    <button type="button" onclick="togglePass()" class="absolute right-4 top-9 text-lg opacity-40 hover:opacity-80">
+                        <span id="eyeIcon">👁️</span>
+                    </button>
+                </div>
+
+                <div id="group-math" class="pt-2">
+                    <label class="text-[10px] font-black uppercase tracking-[0.2em] text-pink-500 ml-1">Verifikasi Manusia</label>
+                    <div class="white-verify-box">
+                        <div id="mathQuestion" class="math-text">0 + 0</div>
+                        <input type="number" id="mathAnswer" placeholder="Hasil?" required>
+                    </div>
+                </div>
+
+                <button type="submit" id="btnSubmit" class="btn-shine w-full py-4 mt-4 rounded-2xl text-white font-black text-sm tracking-[0.2em] uppercase flex items-center justify-center gap-3 active:scale-95 shadow-lg transition-all">
+                    <span id="btnText">CREATE ACCOUNT 🚀</span>
+                    <div id="loader" class="loading-spin hidden"></div>
+                </button>
+            </form>
+
+            <div class="text-center">
+                <a href="index.html" class="inline-block mt-8 text-slate-400 text-[9px] font-black uppercase tracking-[0.3em] hover:text-pink-500 transition-all">
+                    ← Kembali Ke Halaman Utama
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzJFMjybKec38LtO6oimV0Q82MZ8sN9vZ429KevNL8sJMvgSVsJoXIJ1g3vrThjXyLh/exec';
+        let selectedAvatarData = "";
+        let correctMathResult = 0;
+
+        function generateMathChallenge() {
+            const num1 = Math.floor(Math.random() * 20) + 1;
+            const num2 = Math.floor(Math.random() * 10) + 1;
+            const isPlus = Math.random() > 0.5;
+            
+            if(isPlus) {
+                correctMathResult = num1 + num2;
+                document.getElementById('mathQuestion').innerText = `${num1} + ${num2} =`;
+            } else {
+                correctMathResult = num1 - num2;
+                document.getElementById('mathQuestion').innerText = `${num1} - ${num2} =`;
+            }
+            document.getElementById('mathAnswer').value = "";
+        }
+
+        generateMathChallenge();
+
+        function showToast(msg, type = 'error') {
+            const toast = document.getElementById('customToast');
+            const iconImg = document.getElementById('toastImgIcon');
+            const text = document.getElementById('toastMsg');
+            text.innerText = msg;
+            iconImg.classList.add('animate__animated', 'animate__bounceIn');
+
+            if(type === 'error') {
+                iconImg.src = "https://cdn-icons-png.flaticon.com/512/8044/8044598.png";
+                toast.style.borderColor = '#fee2e2';
+            } else {
+                iconImg.src = "https://cdn-icons-png.flaticon.com/512/6808/6808197.png";
+                toast.style.borderColor = '#d1fae5';
+            }
+
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+                iconImg.classList.remove('animate__animated', 'animate__bounceIn');
+            }, 3000);
+        }
+
+        function selectAvatar(element) {
+            document.querySelectorAll('.avatar-option').forEach(img => img.classList.remove('selected'));
+            element.classList.add('selected');
+            selectedAvatarData = element.src;
+        }
+
+        function togglePass() {
+            const passInput = document.getElementById('password');
+            const eye = document.getElementById('eyeIcon');
+            passInput.type = passInput.type === "password" ? "text" : "password";
+            eye.innerText = passInput.type === "password" ? "👁️" : "🔒";
+        }
+
+        function shakeField(groupId) {
+            const el = document.getElementById(groupId);
+            el.classList.add('animate__animated', 'animate__headShake');
+            const input = el.querySelector('input, select');
+            if(input) input.classList.add('input-error');
+            setTimeout(() => el.classList.remove('animate__animated', 'animate__headShake'), 500);
+        }
+
+        document.getElementById('registerForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const secretName = document.getElementById('secretName').value.trim();
+            const gender = document.getElementById('gender').value;
+            const username = document.getElementById('username').value.trim().toLowerCase();
+            const password = document.getElementById('password').value;
+            const userMathAnswer = parseInt(document.getElementById('mathAnswer').value);
+
+            document.querySelectorAll('input, select').forEach(el => el.classList.remove('input-error'));
+
+            let isValid = true;
+            if (!secretName) { shakeField('group-secretName'); isValid = false; }
+            if (!gender) { shakeField('group-gender'); isValid = false; }
+            if (!username) { shakeField('group-username'); isValid = false; }
+            if (!password) { shakeField('group-password'); isValid = false; }
+            if (!selectedAvatarData) { shakeField('group-avatar'); isValid = false; }
+            
+            if (!isValid) {
+                showToast("Lengkapi semua data rahasia!");
+                return;
+            }
+
+            if (userMathAnswer !== correctMathResult) {
+                shakeField('group-math');
+                showToast("Coba lagi!");
+                generateMathChallenge();
+                return;
+            }
+
+            const btn = document.getElementById('btnSubmit');
+            const btnText = document.getElementById('btnText');
+            const loader = document.getElementById('loader');
+
+            btn.disabled = true;
+            btnText.innerText = "MEMBUAT AKUN.....";
+            loader.classList.remove('hidden');
+
+            try {
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        action: 'register',
+                        secretName: secretName,
+                        gender: gender,
+                        username: username,
+                        password: password,
+                        avatar: selectedAvatarData
+                    })
+                });
+                
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    showToast('Akun Berhasil Dibuat!', 'success');
+                    setTimeout(() => window.location.href = 'index-login.html', 2000);
+                } else {
+                    showToast(result.message, 'error');
+                    shakeField('group-username');
+                    btn.disabled = false;
+                    btnText.innerText = "CREATE ACCOUNT 🚀";
+                    loader.classList.add('hidden');
+                    generateMathChallenge();
+                }
+            } catch (error) {
+                showToast("Koneksi gagal, coba lagi!");
+                btn.disabled = false;
+                btnText.innerText = "CREATE ACCOUNT 🚀";
+                loader.classList.add('hidden');
+                generateMathChallenge();
+            }
+        });
+
+        document.addEventListener('contextmenu', e => e.preventDefault());
+        document.addEventListener('keydown', e => {
+            if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J'))) e.preventDefault();
+        });
+    </script>
+</body>
+</html>

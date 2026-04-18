@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Zee Match | Cari Pasangan</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root { --primary-pink: #ff4d6d; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body, html { height: 100vh; width: 100%; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; background: #000; overflow: hidden; }
+        .full-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; object-fit: cover; }
+        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to bottom, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.85)); z-index: 2; }
+        .app-layout { position: relative; width: 90%; max-width: 400px; height: 100dvh; margin: 0 auto; display: flex; flex-direction: column; padding: 20px 0 15px; z-index: 10; }
+
+        .content-area { flex: 1; width: 100%; min-height: 0; display: flex; flex-direction: column; margin-bottom: 12px; overflow: hidden; }
+        .glass-card { flex: 1; background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 35px; padding: 25px; overflow-y: auto; scrollbar-width: none; display: flex; flex-direction: column; }
+        .glass-card::-webkit-scrollbar { display: none; }
+
+        .input-label { font-size: 10px; font-weight: 800; text-transform: uppercase; color: rgba(255, 255, 255, 0.7); margin-bottom: 6px; display: block; letter-spacing: 1px; }
+        .glass-input { width: 100%; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 18px; padding: 14px; font-size: 14px; color: white; outline: none; margin-bottom: 15px; }
+
+        .upload-zone { width: 100%; height: 140px; background: rgba(255,255,255,0.05); border: 2px dashed rgba(255,255,255,0.2); border-radius: 25px; display: flex; flex-direction: column; align-items: center; justify-content: center; margin-bottom: 15px; cursor: pointer; overflow: hidden; position: relative; }
+        #user-photo-preview { position: absolute; width: 100%; height: 100%; object-fit: cover; display: none; }
+
+        .dating-card { position: relative; width: 100%; height: 100%; border-radius: 30px; overflow: hidden; background: #111; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5); }
+        .dating-img { width: 100%; height: 100%; object-fit: cover; }
+        .dating-info { position: absolute; bottom: 0; left: 0; width: 100%; padding: 40px 20px 20px; background: linear-gradient(to top, rgba(0, 0, 0, 1) 30%, transparent); color: white; }
+
+        /* Navbar Glass Style */
+        .nav-bottom { width: 100%; max-width: 380px; height: 70px; display: flex; justify-content: space-around; align-items: center; background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border-radius: 25px; box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4); padding: 0 10px; border: 1px solid rgba(255, 255, 255, 0.1); margin-top: 10px; }
+        .nav-item { transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; align-items: center; justify-content: center; width: 45px; height: 45px; border-radius: 12px; }
+        .nav-item:hover, .nav-item:active { transform: scale(1.2) translateY(-5px); background: rgba(255, 255, 255, 0.1); }
+        .nav-icon { width: 22px; height: 22px; filter: brightness(0) invert(1); }
+
+        /* Notifikasi Glass Atas (Turun Dikit) */
+        #custom-notif { 
+            position: fixed; 
+            top: 25px; /* Turun dikit dari atas */
+            left: 50%; 
+            transform: translateX(-50%); 
+            width: 85%; 
+            max-width: 360px; 
+            z-index: 9999; 
+            background: rgba(255, 255, 255, 0.15); 
+            backdrop-filter: blur(25px); 
+            -webkit-backdrop-filter: blur(25px);
+            padding: 12px 18px; 
+            border-radius: 20px; 
+            display: flex; 
+            flex-direction: row; 
+            align-items: center; 
+            gap: 12px; 
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5); 
+            visibility: hidden; 
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        #notif-img { width: 35px; height: 35px; object-fit: contain; flex-shrink: 0; }
+        #notif-message { flex: 1; font-size: 11px; font-weight: 800; color: #fff; line-height: 1.2; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        @keyframes pulse-custom { 0% { opacity: 0.6; } 50% { opacity: 1; } 100% { opacity: 0.6; } }
+        .loading-text { animation: pulse-custom 1.5s infinite; }
+    </style>
+</head>
+
+<body>
+    <img src="p1.png" class="full-bg" onerror="this.style.background='#1a1a1a'">
+    <div class="overlay"></div>
+
+    <!-- Notifikasi Glass (Horizontal, Atas Tengah) -->
+    <div id="custom-notif" class="animate__animated">
+        <img id="notif-img" src="" alt="icon">
+        <div id="notif-message"></div>
+    </div>
+
+    <div class="app-layout">
+        <div class="header-top flex justify-between items-center mb-4">
+            <button class="bg-white/10 backdrop-blur-md px-4 py-2 rounded-full text-[9px] font-black text-white border border-white/10" onclick="location.href='dashboard.html'">← KEMBALI</button>
+            <h2 style="font-family: 'Dancing Script', cursive;" class="text-3xl text-white">Zee Match</h2>
+            <div class="w-10"></div>
+        </div>
+
+        <div class="content-area">
+            <!-- STEP 1: PROFIL -->
+            <div id="step-profile" class="glass-card animate__animated animate__fadeIn">
+                <p class="text-white font-extrabold text-lg mb-5">Atur Profil Kamu</p>
+                <div class="upload-zone" onclick="document.getElementById('file-input').click()">
+                    <img id="user-photo-preview" src="">
+                    <div id="upload-placeholder" class="flex flex-col items-center text-white/40">
+                        <span class="text-3xl font-light">+</span>
+                        <p class="text-[8px] font-bold tracking-widest uppercase">Pilih Foto Profil</p>
+                    </div>
+                    <input type="file" id="file-input" hidden accept="image/*" onchange="handleImage(this)">
+                </div>
+
+                <label class="input-label">Nama Samaran</label>
+                <input type="text" id="user-name" class="glass-input" placeholder="Nama samaranmu...">
+                
+                <label class="input-label">Bio Singkat</label>
+                <textarea id="user-bio" class="glass-input" rows="2" placeholder="Tentang dirimu..."></textarea>
+
+                <div class="mt-auto">
+                    <button onclick="saveAndFetch()" class="w-full bg-white text-black py-4 rounded-2xl font-black text-xs tracking-widest shadow-xl uppercase transition active:scale-95">
+                        Mulai Cari Match 🔥
+                    </button>
+                </div>
+            </div>
+
+            <!-- STEP 2: LOADING -->
+            <div id="step-loading" class="hidden flex flex-col items-center justify-center h-full">
+                <img src="https://cdn-icons-png.flaticon.com/512/14262/14262903.png" class="w-20 h-20 mb-6 animate__bounce" alt="Cari">
+                <p class="text-white font-black tracking-widest text-xs loading-text">MENCARI PASANGAN...</p>
+            </div>
+
+            <!-- STEP 3: RESULT -->
+            <div id="step-result" class="hidden h-full relative">
+                <div id="card-wrapper" class="h-full"></div>
+            </div>
+        </div>
+
+        <!-- Navbar Glass -->
+        <nav class="nav-bottom animate__animated animate__fadeInUp">
+            <a href="dashboard.html" class="nav-item"><img src="https://cdn-icons-png.flaticon.com/512/7648/7648203.png" class="nav-icon"></a>
+            <a href="cari.html" class="nav-item"><img src="https://cdn-icons-png.flaticon.com/512/954/954591.png" class="nav-icon"></a>
+            <a href="pesan.html" class="nav-item"><img src="https://cdn-icons-png.flaticon.com/512/668/668287.png" class="nav-icon"></a>
+            <a href="game.html" class="nav-item"><img src="https://cdn-icons-png.flaticon.com/512/808/808476.png" class="nav-icon"></a>
+            <a href="profil.html" class="nav-item"><img src="https://cdn-icons-png.flaticon.com/512/9187/9187604.png" class="nav-icon"></a>
+        </nav>
+    </div>
+
+    <script>
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx81nFV5it5yo3rUQj8TzcE0xhyxNHVZHDPHDTNZva3egD1H_3Mgh6TlDMboE0SFpI6/exec";
+        const ICON_WARNING = "https://cdn-icons-png.flaticon.com/512/8044/8044598.png";
+        const ICON_SUCCESS = "https://cdn-icons-png.flaticon.com/512/14262/14262903.png";
+        
+        let myUser = localStorage.getItem('userSecretName') || localStorage.getItem('username');
+        
+        window.onload = () => {
+            if(!myUser || myUser === "null") {
+                showPopup("Login diperlukan!", ICON_WARNING);
+                setTimeout(() => location.href = 'index.html', 2000);
+                return;
+            }
+            document.getElementById('user-name').value = myUser;
+            document.getElementById('user-bio').value = localStorage.getItem('userBio') || "";
+            const avatar = localStorage.getItem('userAvatar');
+            if(avatar && avatar.length > 50) {
+                const prev = document.getElementById('user-photo-preview');
+                prev.src = avatar;
+                prev.style.display = 'block';
+                document.getElementById('upload-placeholder').style.display = 'none';
+            }
+        };
+
+        function handleImage(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const prev = document.getElementById('user-photo-preview');
+                    prev.src = e.target.result;
+                    prev.style.display = 'block';
+                    document.getElementById('upload-placeholder').style.display = 'none';
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function showPopup(msg, iconUrl) {
+            const popup = document.getElementById('custom-notif');
+            document.getElementById('notif-message').innerText = msg;
+            document.getElementById('notif-img').src = iconUrl;
+            
+            popup.style.visibility = 'visible';
+            popup.classList.remove('animate__fadeOutUp');
+            popup.classList.add('animate__fadeInDown');
+
+            setTimeout(() => {
+                popup.classList.replace('animate__fadeInDown', 'animate__fadeOutUp');
+                setTimeout(() => { popup.style.visibility = 'hidden'; }, 500);
+            }, 3000);
+        }
+
+        async function saveAndFetch() {
+            const secretName = document.getElementById('user-name').value;
+            const bio = document.getElementById('user-bio').value;
+            const photo = document.getElementById('user-photo-preview').src;
+
+            if(!secretName || !photo || photo === "" || photo.includes('upload-placeholder')) {
+                return showPopup("Lengkapi Nama & Foto!", ICON_WARNING);
+            }
+
+            document.getElementById('step-profile').classList.add('hidden');
+            document.getElementById('step-loading').classList.remove('hidden');
+
+            localStorage.setItem('userSecretName', secretName);
+            localStorage.setItem('userAvatar', photo);
+            localStorage.setItem('userBio', bio);
+
+            try {
+                await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        action: 'updateProfile',
+                        username: secretName,
+                        secretName: secretName,
+                        avatar: photo,
+                        bio: bio
+                    })
+                });
+                startMatching(secretName);
+            } catch (err) {
+                startMatching(secretName);
+            }
+        }
+
+        let partners = [];
+        let index = 0;
+
+        async function startMatching(name) {
+            try {
+                const resp = await fetch(`${SCRIPT_URL}?action=getMatches&username=${name}`);
+                const data = await resp.json();
+                partners = data.matches || [];
+
+                if(partners.length > 0) {
+                    setTimeout(() => {
+                        document.getElementById('step-loading').classList.add('hidden');
+                        document.getElementById('step-result').classList.remove('hidden');
+                        renderCard();
+                    }, 2000);
+                } else {
+                    showPopup("Belum ada user lain terdaftar", ICON_WARNING);
+                    setTimeout(() => location.reload(), 2500);
+                }
+            } catch (e) {
+                showPopup("Gagal Memuat Data", ICON_WARNING);
+                document.getElementById('step-profile').classList.remove('hidden');
+                document.getElementById('step-loading').classList.add('hidden');
+            }
+        }
+
+        function renderCard() {
+            const p = partners[index];
+            document.getElementById('card-wrapper').innerHTML = `
+                <div class="dating-card animate__animated animate__zoomIn">
+                    <img src="${p.img}" class="dating-img" onerror="this.src='https://via.placeholder.com/400x600?text=No+Photo'">
+                    <div class="dating-info">
+                        <h2 class="text-3xl font-black">${p.name}</h2>
+                        <p class="text-xs opacity-70 mt-1">${p.bio || 'Tidak ada bio.'}</p>
+                        <div class="flex justify-center gap-10 mt-8">
+                            <button onclick="swipe(false)" class="bg-white/10 backdrop-blur-md border border-white/20 w-14 h-14 rounded-full flex items-center justify-center transition active:scale-90">
+                                <img src="https://cdn-icons-png.flaticon.com/512/2976/2976286.png" class="w-7 filter invert">
+                            </button>
+                            <button onclick="swipe(true)" class="bg-white w-14 h-14 rounded-full flex items-center justify-center transition active:scale-90 shadow-xl">
+                                <img src="https://cdn-icons-png.flaticon.com/512/833/833472.png" class="w-8">
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function swipe(isLike) {
+            const card = document.querySelector('.dating-card');
+            card.classList.add(isLike ? 'animate__fadeOutRight' : 'animate__fadeOutLeft');
+            setTimeout(() => {
+                if(isLike) {
+                    const match = partners[index];
+                    localStorage.setItem('last_matched_user', match.name);
+                    localStorage.setItem('last_matched_img', match.img);
+                    showPopup("MATCH BERHASIL! ❤️", ICON_SUCCESS);
+                    setTimeout(() => location.href = 'pesan.html', 1500);
+                } else {
+                    index = (index + 1) % partners.length;
+                    renderCard();
+                }
+            }, 500);
+        }
+    </script>
+</body>
+</html>

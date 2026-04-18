@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Zee App | Dashboard</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body, html {
+            height: 100vh;
+            width: 100%;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f3f4f6;
+            overflow: hidden; 
+        }
+
+        .full-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            object-fit: cover;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, rgba(255,255,255,0.1), rgba(0,0,0,0.6));
+            z-index: 2;
+        }
+
+        /* LAYOUT UTAMA - PENGUNCI POSISI TENGAH */
+        .app-layout {
+            position: relative;
+            width: 90%;
+            max-width: 400px; 
+            height: 100vh;
+            margin: 0 auto; 
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            z-index: 10;
+        }
+
+        /* NOTIFIKASI - SEKARANG DI DALAM LAYOUT BIAR LURUS */
+        #login-notif {
+            position: absolute;
+            top: 50px; /* Jarak dari atas di dalam box layout */
+            width: 100%; /* Lebar penuh mengikuti box 400px */
+            z-index: 9999;
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            padding: 15px 20px;
+            border-radius: 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+            visibility: hidden;
+        }
+
+        .stiker-bear {
+            width: 50px;
+            height: 50px;
+            flex-shrink: 0;
+        }
+
+        .notif-text {
+            color: #1f2937;
+            font-size: 13px;
+            font-weight: 800;
+            line-height: 1.4;
+        }
+
+        /* CARD DASHBOARD */
+        .glass-card {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 40px;
+            padding: 2.5rem 1.5rem;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            transform: translateY(-20px); 
+        }
+
+        .avatar-container {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 1.5rem;
+            border-radius: 50%;
+            padding: 5px;
+            background: linear-gradient(135deg, #ff4d6d, #ff758c);
+        }
+
+        .avatar-img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid white;
+        }
+
+        /* NAVBAR */
+        .nav-bottom {
+            position: absolute;
+            bottom: 30px;
+            left: 0;
+            width: 100%; 
+            height: 75px;
+            display: flex;
+            justify-content: space-evenly;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-radius: 25px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+        }
+
+        .nav-item {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+        }
+
+        .nav-icon {
+            width: 28px;
+            height: 28px;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        /* Efek Zoom 100% pas Mouse Geser */
+        .nav-item:hover .nav-icon {
+            transform: scale(1.8) translateY(-5px);
+        }
+
+        .font-love {
+            font-family: 'Dancing Script', cursive;
+        }
+    </style>
+</head>
+
+<body>
+
+    <img src="p1.png" class="full-bg">
+    <div class="overlay"></div>
+
+    <div class="app-layout">
+        
+        <!-- NOTIFIKASI SEKARANG DI SINI (LURUS DENGAN CARD) -->
+        <div id="login-notif" class="animate__animated">
+            <img src="https://cdn-icons-png.flaticon.com/512/7871/7871500.png" class="stiker-bear">
+            <div class="notif-text">
+                Ups! Kamu harus login dulu sebelum masuk ke Zee App ya.. ✨
+            </div>
+        </div>
+
+        <div class="glass-card animate__animated animate__fadeInUp">
+            <div class="avatar-container">
+                <img id="userAvatar" src="https://cdn-icons-png.flaticon.com/512/1144/1144760.png" class="avatar-img">
+            </div>
+
+            <h2 class="text-gray-500 text-[10px] font-black uppercase tracking-[0.3em] mb-1">Welcome Back ✨</h2>
+            <h1 class="text-4xl font-love text-gray-900 mb-2" id="displayName">Zee User</h1>
+
+            <p class="text-gray-600 text-xs font-semibold px-4">
+                Senang melihatmu kembali di Zee App. Yuk, cek aktivitasmu hari ini!
+            </p>
+
+            <div class="mt-6">
+                <button class="bg-gradient-to-r from-pink-500 to-rose-400 text-white text-[10px] font-bold py-2 px-6 rounded-full uppercase tracking-widest shadow-lg active:scale-95 transition-all">
+                    Explore Now
+                </button>
+            </div>
+        </div>
+
+        <nav class="nav-bottom animate__animated animate__fadeInUp animate__delay-1s">
+    <!-- Ikon Property yang sudah diperbarui linknya -->
+    <a href="dashboard.html" class="nav-item">
+        <img src="https://cdn-icons-png.flaticon.com/512/7648/7648203.png" class="nav-icon">
+    </a>
+    <a href="cari.html" class="nav-item">
+        <img src="https://cdn-icons-png.flaticon.com/512/954/954591.png" class="nav-icon">
+    </a>
+    <a href="pesan.html" class="nav-item">
+        <img src="https://cdn-icons-png.flaticon.com/512/668/668287.png" class="nav-icon">
+    </a>
+    <a href="game.html" class="nav-item">
+        <img src="https://cdn-icons-png.flaticon.com/512/808/808476.png" class="nav-icon">
+    </a>
+    <a href="helpdesk.html" class="nav-item">
+        <img src="https://cdn-icons-png.flaticon.com/512/8662/8662591.png" class="nav-icon">
+    </a>
+    <a href="profil.html" class="nav-item">
+        <img src="https://cdn-icons-png.flaticon.com/512/9187/9187604.png" class="nav-icon">
+    </a>
+</nav>
+    </div>
+
+    <script>
+        (function() {
+            const secretName = localStorage.getItem('userSecretName');
+            const avatarUrl = localStorage.getItem('userAvatar');
+            const notif = document.getElementById('login-notif');
+
+            // VALIDASI LOGIN
+            if (!secretName || secretName === "undefined") {
+                window.onload = () => {
+                    notif.style.visibility = 'visible';
+                    notif.classList.add('animate__fadeInDown'); 
+
+                    // Tampil 10 Detik
+                    setTimeout(() => {
+                        notif.classList.replace('animate__fadeInDown', 'animate__fadeOutUp');
+                        setTimeout(() => {
+                            window.location.href = 'index.html';
+                        }, 800);
+                    }, 10000); 
+                };
+                return;
+            }
+
+            // SET DATA JIKA OK
+            document.addEventListener("DOMContentLoaded", function() {
+                document.getElementById('displayName').innerText = secretName;
+                if (avatarUrl && avatarUrl !== "undefined") {
+                    document.getElementById('userAvatar').src = avatarUrl;
+                }
+            });
+        })();
+    </script>
+
+</body>
+</html>
